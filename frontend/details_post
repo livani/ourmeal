@@ -1,0 +1,171 @@
+<?PHP
+	include('../Backend/dbconnect.php');
+	
+	$pid= $_GET['pid'];
+	
+	$sql = "SELECT * FROM post WHERE id=$pid";
+	$result = $conn->query($sql);
+	if ($result->num_rows==1) {
+		while ($row = $result->fetch_assoc()) {
+			$p_content= $row['p_content'];
+			$p_name= $row['p_name'];
+			$p_description= $row['p_description'];
+			$p_date= $row['p_date'];
+		}
+	} else
+		echo "There is no entry in the database.<br>";
+?>
+<html>
+<head>
+<title>Post</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="Food Corner Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+<!-- bootstrap-css -->
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<style>
+	.search {
+		margin: 15px;
+	}
+	.type {
+		overflow: hidden
+	}
+	.tile {
+		height: 60px;
+		border: 1px solid lightgrey;
+		margin-bottom: 15px;
+	}
+	.tile-header {
+		background-color: lightgrey;
+	}
+	.tile-header p {
+		margin-left: 10px;
+		float: left;
+	}
+	.tile-header section {
+		margin-right: 10px;
+		text-align: right;
+	}
+	.content {
+		margin-top: 5px;
+		margin-bottom: 2px;
+		position: absolute;
+		margin-left: 10px;
+		color: grey;
+	}
+	.text {
+		width: 100%;
+		height: auto;
+		border: none;
+		margin-bottom: 5px!important;
+		margin-left: 5px;
+	}
+	.margin-top {
+		margin-top: 30px!important;
+	}
+	.categories button {
+		border: 2px solid maroon!important;
+		background-color: #fff!important;
+		padding: 7px 15px;
+		margin-right: 10px;
+	}
+	.categories button:hover {
+		background-color: #efefef!important;
+	}
+</style>
+<!--// bootstrap-css -->
+<!-- css -->
+<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
+<!--// css -->
+<link rel="stylesheet" href="css/owl.carousel.css" type="text/css" media="all">
+<link href="css/owl.theme.css" rel="stylesheet">
+<!-- font-awesome icons -->
+<link href="css/font-awesome.css" rel="stylesheet"> 
+<!-- //font-awesome icons -->
+<!-- font -->
+<link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic' rel='stylesheet' type='text/css'>
+<link href='//fonts.googleapis.com/css?family=Roboto+Condensed:400,700italic,700,400italic,300italic,300' rel='stylesheet' type='text/css'>
+<!-- //font -->
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/SmoothScroll.min.js"></script>
+</head>
+<body>  
+  <div class="blog">
+    <div class="container">
+      <div class="agile-blog-grids">
+        <div class="col-md-8 agile-blog-grid-left">
+          <div class="agile-blog-grid">
+            <div class="agile-blog-grid-left-img">
+              <img class="post-image" src="<?php echo $p_content; ?>">
+            </div>
+			
+<?PHP
+	$sql = "SELECT pc.*, cr.cr_username FROM postcomment pc, customer c, post p, credentials cr WHERE pc.pc_fk_cid=c.id AND pc.pc_fk_pid=p.id AND c.c_fk_crid=cr.id AND pc.pc_deleted=0 AND p.id='$pid'";
+	$result = $conn->query($sql);
+	if($result -> num_rows>0){
+		while($row = $result->fetch_assoc()){
+			$pc_content= $row['pc_content'];
+			$pc_date= $row['pc_date'];
+			$cr_username= $row['cr_username'];
+
+            
+			echo "
+				<div class='margin-top opinion tile'>
+					<div class='tile-header'>
+						<p> $cr_username </p>
+						<section> $pc_date</section>
+					</div>
+					<div class='content'>
+						<p> \"$pc_content\" </p>
+					</div>
+				</div>
+			";
+   		}
+	}
+?>       
+            
+            <div class="margin-top opinion">
+              <h3>Leave Your Comment</h3>
+              <form action="postcomment_add.php?pid=<?PHP echo $pid; ?>" method="post">
+                <textarea name="pc_content" placeholder="Message" required=""></textarea>
+                <input type="submit" value="SEND">
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 agile-blog-grid-right">
+          <div class="categories">
+            <h3><?php 
+				echo $p_name ?></h3>
+            <p><?php
+				echo $p_description ?>
+            </p>
+            <!-- <button class= "w3-button w3-white">Order</button> 
+              <a href='customerprofile.php?action=details_post&pid=<?PHP echo $pid;?>&add_mid=<?PHP echo $mid;?>'><button class= "w3-button w3-white">Like</button></a> -->
+          </div>
+         </div>
+    </div>
+  </div>
+<?PHP
+	if (isset($_GET['add_mid'])){
+		if (!empty($_SESSION['cart'])){
+			$position= count($_SESSION['cart']);
+			$position+=1;
+			$_SESSION['cart'][$position]= array($_GET['add_mid'], $_POST['amount']);
+		} else {
+			$_SESSION['cart']= array();
+			$_SESSION['cart'][0]= array($_GET['add_mid'], $_POST['amount']);
+		}
+		
+	}
+?>
+  
+</body> 
+</html>
+<html>
