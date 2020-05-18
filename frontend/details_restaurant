@@ -1,0 +1,330 @@
+<?PHP
+	include("../Backend/dbconnect.php");
+	
+	//save the GET-Parameter (restaurant name) to the variable $r_name
+	$r_name= $_GET['r_name'];
+	
+	
+?>
+
+<html>
+	<head>
+		<style>
+			.search {
+				margin: 15px;
+			}
+			.type {
+				overflow: hidden
+			}
+			.tile {
+				width: 250px;
+				height: 380px;
+				border: 2px solid maroon;
+				margin-left: 15px;
+				margin-bottom: 15px;
+				float:left
+			}
+			.image {
+				width: 240px;
+				height: 240px;
+				border: none;
+				margin-bottom: 5px!important;
+				margin-left: 5px;
+				margin-top: 5px;
+				margin-right: 5px;
+			}
+			.text {
+				width: 100%;
+				height: auto;
+				border: none;
+				margin-bottom: 5px!important;
+				margin-left: 5px;
+			}
+			.title {
+				font-size: 100%!important;
+				font-weight: bold;
+				width: 96%;
+				text-align: center;
+				margin-bottom: 20px;
+			}
+			.tile.text input {
+				background: transparent;
+				width: 25px!important;
+				height: 38px;
+				vertical-align: bottom;
+				position: relative;
+				outline: 0;
+				border: none;
+				border-bottom: 2px solid maroon;
+				text-align: center;
+			}
+			.tile.text button {
+				border: 2px solid maroon!important;
+				background-color: #fff!important;
+				padding: 7px 15px;
+				float: right;
+				margin-right: 10px;
+			}
+			.tile.text button:hover {
+				background-color: #efefef!important;
+			}
+			a {
+				text-decoration: none;
+				color: black;
+			}
+			a::visited {
+				text-decoration: none;
+				color: black;
+			}
+			.warning {
+				color: maroon;
+			}
+		</style>
+		<script>
+			function searchMeal() {
+			  // Declare variables 
+			  var filter, a, text, i, x;
+			  filter= document.getElementById("searchinput").value.toUpperCase();
+			  //get every tile (variable "a" is an array)
+			  a= document.getElementsByTagName("a");
+			  
+			  // Loop through all tile divs, and hide those who don't match the search query
+			  for (i=0; i<a.length; i++){
+				text= a[i].getElementsByClassName("text");
+				//for each tile ("a" element), get every text element and search for the value
+				for (x=0; x<text.length; x++){
+					//if the value is found anywhere, display the element and break. If its not found, hide the element
+					if (text[x].innerHTML.toUpperCase().indexOf(filter) > -1) {
+						a[i].style.display= "";
+						break;
+					} else {
+						a[i].style.display= "none";
+					}	
+				}
+			  }
+			}
+			function submitForm(ref){
+				var id= ref.parentNode;
+				id.submit();
+			}
+		</script>
+	</head>
+	<body>
+	
+<?PHP
+	if (isset($_GET['warning']) AND $_GET['warning']=='quantity'){
+		echo "<p class='warning'>Please insert a quantity > 0 before adding to cart.</p>";
+	}
+	if (isset($_GET['warning']) AND $_GET['warning']=='exists'){
+		echo "<p class='warning'>The item already exists in your shopping cart. You can increase the quantity in your shopping cart view.</p>";
+	}
+
+	if (isset($_GET['add_mid'])){
+		if ($_POST['amount']>0){
+			$cart_item= array('quantity'=>$_POST['amount']);
+			if(!isset($_SESSION['cart'])){
+				$_SESSION['cart'] = array();
+			}
+			
+			if(array_key_exists($_GET['add_mid'], $_SESSION['cart'])){
+				 echo "<meta http-equiv='refresh' content='0 url=customerprofile.php?action=details_restaurant&r_name=".$r_name."&warning=exists'>";
+			} else {
+				$_SESSION['cart'][$_GET['add_mid']]=$cart_item;
+				echo "<meta http-equiv='refresh' content='0 url=customerprofile.php?action=details_restaurant&r_name=".$r_name."'>";
+			}
+		} else
+			echo "<meta http-equiv='refresh' content='0 url=customerprofile.php?action=details_restaurant&r_name=".$r_name."&warning=quantity'>";
+	}
+?>
+		<div class="search">
+			<input type='text' id='searchinput' onkeyup='searchMeal()' placeholder='Search for meal..'>
+		</div>
+		
+		<div class="type">
+			<h1> Starter </h1>
+
+<?PHP
+	//Select all meals from type 'starter' (m_fk_mtid) from the restaurant in $r_name variable. (r.id=m.m_fk_rid) is the SQL Join between the tables meal and restaurant
+	$sql= "SELECT m.* FROM meal m, restaurant r WHERE r.id=m.m_fk_rid AND r.r_name='$r_name' AND m.m_fk_mtid=1 AND m.m_deleted=0";
+	$result = $conn->query($sql);
+	if ($result->num_rows>0) {
+		while ($row = $result->fetch_assoc()) {
+			//Get the meal data for each meal in $result in here
+			$mid= $row['id'];
+			$m_name= $row['m_name'];
+			$m_description= $row['m_description'];
+			$m_price= $row['m_price'];
+			$m_image= $row['m_image'];
+			
+			//Print the values for each meals with beautiful css here.. Since it's in a while loop, just one time coding is required.
+			echo "
+			
+				<div class='tile'>
+					<section class='tile image'>
+						<img src='$m_image' width=240px;>
+					</section>
+					<section class='tile text title'>
+						$m_name
+					 </section>
+					 <section class='tile text'>
+						Price: $m_price IDR
+					</section>
+					<section class='tile text'>
+						$m_description
+					</section>
+					<section class='tile text'>
+						<form action='customerprofile.php?action=details_restaurant&r_name=$r_name&add_mid=$mid' method='POST'>
+							<input type='text' class='tfamount' name='amount' placeholder='#'>
+							<button id='test' onclick='submitForm(this);'><i class='fa fa-shopping-cart'></i> Add</button>
+						</form>
+					</section>
+				</div>
+			
+			";
+			
+		}
+	} else
+		echo "Currently we are not offering any starters.";
+	
+?>
+	</div>
+	<div class="type">
+			<h1> Main Course </h1>
+
+<?PHP	
+	//Select all meals from type 'main course' (m_fk_mtid) from the restaurant in $r_name variable. (r.id=m.m_fk_rid) is the SQL Join between the tables meal and restaurant
+	$sql= "SELECT m.* FROM meal m, restaurant r WHERE r.id=m.m_fk_rid AND r.r_name='$r_name' AND m.m_fk_mtid=2 AND m.m_deleted=0";
+	$result = $conn->query($sql);
+	if ($result->num_rows>0) {
+		while ($row = $result->fetch_assoc()) {
+			//Get the meal data for each meal in $result in here
+			$mid= $row['id'];
+			$m_name= $row['m_name'];
+			$m_description= $row['m_description'];
+			$m_price= $row['m_price'];
+			$m_image= $row['m_image'];
+			
+			//Print the values for each meals with beautiful css here.. Since it's in a while loop, just one time coding is required.
+			echo "
+			
+				<div class='tile'>
+					<section class='tile image'>
+						<img src='$m_image' width=235px;>
+					</section>
+					<section class='tile text title'>
+						$m_name
+					 </section>
+					 <section class='tile text'>
+						Price: $m_price IDR
+					</section>
+					<section class='tile text'>
+						$m_description
+					</section>
+					<section class='tile text'>
+						<form action='customerprofile.php?action=details_restaurant&r_name=$r_name&add_mid=$mid' method='POST'>
+							<input type='text' class='tfamount' name='amount' placeholder='#'>
+							<button id='test' onclick='submitForm(this);'><i class='fa fa-shopping-cart'></i> Add</button>
+						</form>
+					</section>
+				</div>
+			";
+			
+		}
+	} else
+		echo "Currently we are not offering any main course.";
+	
+?>
+	</div>
+	<div class="type">
+		<h1> Dessert </h1>
+<?PHP
+	//Select all meals from type 'dessert' (m_fk_mtid) from the restaurant in $r_name variable. (r.id=m.m_fk_rid) is the SQL Join between the tables meal and restaurant
+	$sql= "SELECT m.* FROM meal m, restaurant r WHERE r.id=m.m_fk_rid AND r.r_name='$r_name' AND m.m_fk_mtid=3 AND m.m_deleted=0";
+	$result = $conn->query($sql);
+	if ($result->num_rows>0) {
+		while ($row = $result->fetch_assoc()) {
+			//Get the meal data for each meal in $result in here
+			$mid= $row['id'];
+			$m_name= $row['m_name'];
+			$m_description= $row['m_description'];
+			$m_price= $row['m_price'];
+			$m_image= $row['m_image'];
+			
+			//Print the values for each meals with beautiful css here.. Since it's in a while loop, just one time coding is required.
+			echo "
+			
+				<div class='tile'>
+					<section class='tile image'>
+						<img src='$m_image' width=240px;>
+					</section>
+					<section class='tile text title'>
+						$m_name
+					 </section>
+					 <section class='tile text'>
+						Price: $m_price IDR
+					</section>
+					<section class='tile text'>
+						$m_description
+					</section>
+					<section class='tile text'>
+						<form action='customerprofile.php?action=details_restaurant&r_name=$r_name&add_mid=$mid' method='POST'>
+							<input type='text' class='tfamount' name='amount' placeholder='#'>
+							<button id='test' onclick='submitForm(this);'><i class='fa fa-shopping-cart'></i> Add</button>
+						</form>
+					</section>
+				</div>
+			";
+			
+		}
+	} else
+		echo "Currently we are not offering any desserts.";
+
+?>
+	</div>
+	<div class="type">
+		<h1> Drinks </h1>
+<?PHP
+	//Select all meals from type 'drinks' (m_fk_mtid) from the restaurant in $r_name variable. (r.id=m.m_fk_rid) is the SQL Join between the tables meal and restaurant
+	$sql= "SELECT m.* FROM meal m, restaurant r WHERE r.id=m.m_fk_rid AND r.r_name='$r_name' AND m.m_fk_mtid=4 AND m.m_deleted=0";
+	$result = $conn->query($sql);
+	if ($result->num_rows>0) {
+		while ($row = $result->fetch_assoc()) {
+			//Get the meal data for each meal in $result in here
+			$mid= $row['id'];
+			$m_name= $row['m_name'];
+			$m_description= $row['m_description'];
+			$m_price= $row['m_price'];
+			$m_image= $row['m_image'];
+			
+			//Print the values for each meals with beautiful css here.. Since it's in a while loop, just one time coding is required.
+			echo "
+			
+				<div class='tile'>
+					<section class='tile image'>
+						<img src='$m_image' width=240px;>
+					</section>
+					<section class='tile text title'>
+						$m_name
+					 </section>
+					 <section class='tile text'>
+						Price: $m_price IDR
+					</section>
+					<section class='tile text'>
+						$m_description
+					</section>
+					<section class='tile text'>
+						<form action='customerprofile.php?action=details_restaurant&r_name=$r_name&add_mid=$mid' method='POST'>
+							<input type='text' class='tfamount' name='amount' placeholder='#'>
+							<button id='test' onclick='submitForm(this);'><i class='fa fa-shopping-cart'></i> Add</button>
+						</form>
+					</section>
+				</div>
+			";
+			
+		}
+	} else
+		echo "Currently we are not offering any drinks.";
+?>
+		</div>
+	</body>
+</html>
