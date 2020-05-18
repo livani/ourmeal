@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html> 
+	<head>	
+	<style type= "text/css">
+		.title {
+			color: grey; 
+			font-size: 170%;   
+			border-bottom: 6px solid; 
+			border-color: maroon;
+		}
+		ul { 
+			list-style-type: none;
+			overflow: hidden;
+			background-color: maroon; 
+			opacity: 30%
+		}
+		li { 
+			float: left;
+		}
+		li a {
+			display: block; 
+			color: white;
+			text-align: center; 
+			padding: 14px 16px;  
+			text-decoration: none;
+		}
+		li a:hover { 
+			background-color: #111;
+		}
+		.block {
+			display: inline-block;
+			text-align: left;
+		}
+		.center {
+			text-align: center;
+		}
+	</style>
+	<script>
+		  var clicked = false;
+		  function customerRegisterPage()
+		  {
+		  if(!clicked)
+		  {
+		  document.getElementById("customer").innerHTML=" <div class = "title">			
+			
+			clicked=true;
+			
+				  document.getElementById("customerSS").innerHTML="Customer"; 
+					document.getElememtById("customer").innerHTML="Customer";
+
+		  }	else {
+			document.getElementById("CustomerSS").innerHTML="Customer";
+					document.getElementById("customer").innerHTML="";
+					
+					clicked = false;
+			
+		  }
+		  }
+	  	
+    </script>
+	</head>
+		<body>      
+		<div class="center">
+			<div class="block">
+				<img src= "Restaurant-Logo-by-Sean-Farrell.jpg" width= "70" height= "70"> 
+					
+					 <form action= "inDb.php" method= "POST" enctype="multipart/form-data">
+						 Profile Picture
+						 <input type="file" name="fileToUpload" id="fileToUpload" style="float:right" required> 
+						 <br>
+						 <br>
+						 Username:<br>
+						 <input type= "text" name= "username" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 Email:<br>
+						 <input type= "email" name= "email" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 Password:<br>
+						 <input type="password" name="password" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 First Name: <br>
+						 <input type= "text" name= "firstname" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 Last Name: <br>
+						 <input type= "text" name= "lastname" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 Street:<br>
+						 <input type= "text" name= "street" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 Number:<br>
+						 <input type= "text" name= "number" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 Zip-Code:<br>
+						 <input type= "text" name= "zip" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 City:<br>
+						 <input type= "text" name= "city" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 Country:<br>
+						 <input type= "text" name= "country" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 Phone Number:<br>
+						 <input type= "text" name= "phone" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 Birthdate:<br>
+						 <input type= "date" name= "birthdate" size= 50 style ="border: 0px solid white; border-bottom: 1px solid maroon" required> <br>
+						 <br>
+						 Gender:
+						 <br>
+						 <input type= "radio" name= "gender" value= "male" required>
+						 Male
+						 <input type="radio" name="gender" value= "female" required> 
+						 Female
+						 <br>
+						 <br>		 
+						 
+						<input type="submit" name="login" value= "Register" size= 200 style= "font-size: 50;  display: block; margin: auto"> <br>
+					</form>
+				</div>
+			</div>
+			
+			<footer>
+				<ul>
+					<li><a class="active" href="#home">About</a></li>
+					<li><a href="#news">Help</a></li>
+					<li><a href="#contact">Language</a></li>
+				</ul>
+			</footer>
+       
+		  
+		 	</body> 
+	</html>
+		 
